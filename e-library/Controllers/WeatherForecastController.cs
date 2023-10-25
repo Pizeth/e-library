@@ -29,4 +29,6 @@ public class WeatherForecastController : ControllerBase
         })
         .ToArray();
     }
+
+    // Scaffold-DbContext -Connection Name=ElearningDB Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
 }
