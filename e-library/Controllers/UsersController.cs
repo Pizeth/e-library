@@ -13,9 +13,9 @@ namespace e_library.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly NetCoreAuthenticationContext _context;
+        private readonly ElearningDbContext _context;
 
-        public UsersController(NetCoreAuthenticationContext context)
+        public UsersController(ElearningDbContext context)
         {
             _context = context;
         }

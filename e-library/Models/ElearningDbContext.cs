@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace e_library.Models;
 
-public partial class NetCoreAuthenticationContext : DbContext
+public partial class ElearningDbContext : DbContext
 {
-    public NetCoreAuthenticationContext()
+    public ElearningDbContext()
     {
     }
 
-    public NetCoreAuthenticationContext(DbContextOptions<NetCoreAuthenticationContext> options)
+    public ElearningDbContext(DbContextOptions<ElearningDbContext> options)
         : base(options)
     {
     }
