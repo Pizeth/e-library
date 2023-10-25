@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using e_library.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Options;
+using Newtonsoft.Json;
+using NuGet.DependencyResolver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +17,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ElearningDbContext>(options => options.UseSqlServer(
 builder.Configuration.GetConnectionString("DefaultConnection")
 ));
+
+//builder.Services.AddMvc(option => option.EnableEndpointRouting = false)
+//                .SetCompatibilityVersion(CompatibilityVersion.Latest)
+//                .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
 var app = builder.Build();
 

@@ -54,7 +54,7 @@ namespace e_library.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.UserId)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
@@ -96,7 +96,7 @@ namespace e_library.Controllers
             }
             catch (DbUpdateException)
             {
-                if (UserExists(user.UserId))
+                if (UserExists(user.Id))
                 {
                     return Conflict();
                 }
@@ -106,7 +106,7 @@ namespace e_library.Controllers
                 }
             }
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5
@@ -131,7 +131,7 @@ namespace e_library.Controllers
 
         private bool UserExists(int id)
         {
-            return (_context.Users?.Any(e => e.UserId == id)).GetValueOrDefault();
+            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

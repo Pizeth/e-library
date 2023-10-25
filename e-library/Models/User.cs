@@ -5,7 +5,7 @@ namespace e_library.Models;
 
 public partial class User
 {
-    public int UserId { get; set; }
+    public int Id { get; set; }
 
     public string Username { get; set; } = null!;
 
@@ -15,6 +15,8 @@ public partial class User
 
     public DateTime? Dob { get; set; }
 
+    public int RoleId { get; set; }
+
     public string? FirstName { get; set; }
 
     public string? LastName { get; set; }
@@ -23,5 +25,9 @@ public partial class User
 
     public string? Phone { get; set; }
 
+    public string? Avatar { get; set; }
+
     public string? Salt { get; set; }
+
+    public DateTime? RegDate { get; set; }
 }
