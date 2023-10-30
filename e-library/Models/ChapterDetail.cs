@@ -12,4 +12,6 @@ public partial class ChapterDetail
     public string? Image { get; set; }
 
     public string? Body { get; set; }
+
+    public virtual BookChapter Chapter { get; set; } = null!;
 }

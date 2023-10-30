@@ -20,4 +20,12 @@ public partial class Book
     public int? CategoryId { get; set; }
 
     public int? GenreId { get; set; }
+
+    public virtual Author Author { get; set; } = null!;
+
+    public virtual ICollection<BookChapter> BookChapters { get; set; } = new List<BookChapter>();
+
+    public virtual Category? Category { get; set; }
+
+    public virtual Genre? Genre { get; set; }
 }

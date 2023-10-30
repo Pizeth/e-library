@@ -14,4 +14,6 @@ public partial class Author
     public string PenName { get; set; } = null!;
 
     public string? Avatar { get; set; }
+
+    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

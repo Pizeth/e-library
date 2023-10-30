@@ -10,4 +10,6 @@ public partial class Genre
     public string Genre1 { get; set; } = null!;
 
     public string? Cover { get; set; }
+
+    public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

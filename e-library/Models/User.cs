@@ -30,4 +30,14 @@ public partial class User
     public string? Salt { get; set; }
 
     public DateTime? RegDate { get; set; }
+
+    public virtual ICollection<CourseDetail> CourseDetails { get; set; } = new List<CourseDetail>();
+
+    public virtual ICollection<Professor> Professors { get; set; } = new List<Professor>();
+
+    public virtual ICollection<QuizTaker> QuizTakers { get; set; } = new List<QuizTaker>();
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    public virtual Role Role { get; set; } = null!;
 }
