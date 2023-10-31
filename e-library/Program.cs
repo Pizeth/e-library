@@ -24,12 +24,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
-var jwtSection = builder.Configuration.GetSection("JWTSetting");
+var jwtSection = builder.Configuration.GetSection("JWTSettings");
 builder.Services.Configure<JWTSetting>(jwtSection);
 
 //////to validate the token which has been sent by clients
-//var appSettings = jwtSection.Get<JWTSetting>();
-//var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
+var appSettings = jwtSection.Get<JWTSetting>();
+var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
 
 
 // For Identity  
@@ -61,7 +61,7 @@ builder.Services.AddAuthentication(options =>
                     //ValidIssuer = config["JwtSettings:Issuer"],
                     //ValidAudience = config["JwtSettings:Audience"],
                     ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWTSettings:SecretKey"]))
                 };
             });
 

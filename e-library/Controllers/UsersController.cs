@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using e_library.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace e_library.Controllers
 {
@@ -23,11 +24,13 @@ namespace e_library.Controllers
     {
         private readonly ElearningDbContext _context;
         private readonly JWTSetting _jwtSetting;
+        private readonly IServer _server;
 
-        public UsersController(ElearningDbContext context, IOptions<JWTSetting> jwtsetting)
+        public UsersController(ElearningDbContext context, IOptions<JWTSetting> jwtsetting, IServer server)
         {
             _context = context;
             _jwtSetting = jwtsetting.Value;
+            _server = server;
         }
 
         // GET: api/Users
@@ -59,30 +62,89 @@ namespace e_library.Controllers
             return user;
         }
 
-        // GET: api/User
-        [HttpGet("GetUser")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        // GET: api/Users/5
+        [HttpGet("GetUserDetails/{id}")]
+        public async Task<ActionResult<User>> GetUserDetails(int id)
         {
-            string email = HttpContext.User.Identity.Name;
+            var user = await _context.Users.Include(u => u.Role)
+                                            .Where(u => u.Id == id)
+                                            .FirstOrDefaultAsync();
 
-            var user = await _context.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
-
-            if (_context.Users == null)
+            if (user == null)
             {
                 return NotFound();
             }
-            return await _context.Users.ToListAsync();
+
+            return user;
         }
 
         //GET: api/User
-       [HttpPost("Login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<UserWithToken>> Login([FromBody] User user)
         {
             user = await _context.Users.Include(u => u.Role)
-                                        .Where(u => u.Email == user.Email
+                                        .Where(u => (u.Email == user.Username
+                                                || u.Username == user.Username)
                                                 && u.Password == user.Password).FirstOrDefaultAsync();
+            UserWithToken userWithToken;
+            if (user != null)
+            {
+                userWithToken = new UserWithToken(user);
+                RefreshToken refreshToken = GenerateRefreshToken();
+                user.RefreshTokens.Add(refreshToken);
+                await _context.SaveChangesAsync();
 
-            UserWithToken userWithToken = new UserWithToken(user);
+                userWithToken = new UserWithToken(user);
+                userWithToken.RefreshToken = refreshToken.Token;
+                //sign your token here here..
+                userWithToken.AccessToken = GenerateAccessToken(user.Id);
+                return userWithToken;
+            } else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [Route("Upload")]
+        public async Task<IActionResult> UploadFile(IFormFile file, CancellationToken cancellationtoken)
+        {
+            var result = await WriteFile(file);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("Path")]
+        public async Task<string> ToPath()
+        {
+            var addresses = GetPath().Result;
+            return addresses;
+        }
+
+        private async Task<string> GetPath()
+        {
+            //string filename = "";
+            //var addresses = string.Join(", ", _server.Features.Get<IServerAddressesFeature>().Addresses.ToArray());
+            string[] addresses = _server.Features.Get<IServerAddressesFeature>().Addresses.ToArray();
+            return addresses[0];
+        }
+
+
+        // POST: api/Users
+        [HttpPost("Register")]
+        public async Task<ActionResult<UserWithToken>> RegisterUser(IFormFile file, [FromBody] User user, CancellationToken cancellationtoken)
+        {
+            var result = await WriteFile(file);
+            user.Avatar = result;
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            //load role for registered user
+            user = await _context.Users.Include(u => u.Role)
+                                        .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+
+            UserWithToken userWithToken = null;
 
             if (user != null)
             {
@@ -102,6 +164,34 @@ namespace e_library.Controllers
             //sign your token here here..
             userWithToken.AccessToken = GenerateAccessToken(user.Id);
             return userWithToken;
+        }
+
+        private async Task<string> WriteFile(IFormFile file)
+        {
+            //string filename = "";
+            string exactpath = "";
+            try
+            {
+                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+                var filename = DateTime.Now.Ticks.ToString() + extension;
+
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files");
+
+                if (!Directory.Exists(filepath))
+                {
+                    Directory.CreateDirectory(filepath);
+                }
+
+                exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
+                using (var stream = new FileStream(exactpath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return exactpath;
         }
 
         // GET: api/Users
@@ -258,24 +348,10 @@ namespace e_library.Controllers
         {
           if (_context.Users == null)
           {
-              return Problem("Entity set 'NetCoreAuthenticationContext.Users'  is null.");
+              return Problem("Entity set 'ElearningDbContext.Users'  is null.");
           }
             _context.Users.Add(user);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }

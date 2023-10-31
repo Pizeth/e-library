@@ -17,8 +17,6 @@
             this.Phone = user.Phone;    
             this.Address = user.Address;
             this.Dob = user.Dob;
-
-            this.Role = user.Role;
         }
     }
 }
