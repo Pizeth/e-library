@@ -109,7 +109,7 @@ namespace e_library.Controllers
         [Route("Upload")]
         public async Task<IActionResult> UploadFile(IFormFile file, CancellationToken cancellationtoken)
         {
-            var result = await WriteFile(file);
+            var result = await WriteFile(file, "piseth");
             return Ok(result);
         }
 
@@ -125,17 +125,23 @@ namespace e_library.Controllers
         {
             //string filename = "";
             //var addresses = string.Join(", ", _server.Features.Get<IServerAddressesFeature>().Addresses.ToArray());
-            string[] addresses = _server.Features.Get<IServerAddressesFeature>().Addresses.ToArray();
-            return addresses[0];
+            //string[] addresses = _server.Features.Get<IServerAddressesFeature>().Addresses.ToArray();
+            string path = new UriBuilder
+            {
+                Scheme = Request.Scheme,
+                Host = Request.Host.Host,
+                Port = Request.Host.Port ?? -1
+            }.ToString();
+            return path;
         }
 
 
         // POST: api/Users
         [HttpPost("Register")]
-        public async Task<ActionResult<UserWithToken>> RegisterUser(IFormFile file, [FromBody] User user, CancellationToken cancellationtoken)
+        public async Task<ActionResult<UserWithToken>> RegisterUser([FromBody] User user)
         {
-            var result = await WriteFile(file);
-            user.Avatar = result;
+            //var result = await WriteFile(file, user.Username);
+            //user.Avatar = GetPath().Result + result;
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -144,7 +150,7 @@ namespace e_library.Controllers
             user = await _context.Users.Include(u => u.Role)
                                         .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
 
-            UserWithToken userWithToken = null;
+            UserWithToken userWithToken;
 
             if (user != null)
             {
@@ -154,26 +160,22 @@ namespace e_library.Controllers
 
                 userWithToken = new UserWithToken(user);
                 userWithToken.RefreshToken = refreshToken.Token;
-            }
-
-            if (userWithToken == null)
+                //sign your token here here..
+                userWithToken.AccessToken = GenerateAccessToken(user.Id);
+                return userWithToken;
+            } else
             {
                 return NotFound();
-            }
-
-            //sign your token here here..
-            userWithToken.AccessToken = GenerateAccessToken(user.Id);
-            return userWithToken;
+            }            
         }
 
-        private async Task<string> WriteFile(IFormFile file)
+        private async Task<string> WriteFile(IFormFile file, string name)
         {
-            //string filename = "";
-            string exactpath = "";
+            string filename = "";
             try
             {
                 var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-                var filename = DateTime.Now.Ticks.ToString() + extension;
+                filename = name + "_" + DateTime.Now.Ticks.ToString() + extension;
 
                 var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files");
 
@@ -182,7 +184,8 @@ namespace e_library.Controllers
                     Directory.CreateDirectory(filepath);
                 }
 
-                exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
+                //exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files", filename);
+                var exactpath = Path.Combine(filepath, filename);
                 using (var stream = new FileStream(exactpath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
@@ -191,7 +194,7 @@ namespace e_library.Controllers
             catch (Exception ex)
             {
             }
-            return exactpath;
+            return "/Images/" + filename;
         }
 
         // GET: api/Users
