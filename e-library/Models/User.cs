@@ -5,13 +5,13 @@ namespace e_library.Models;
 
 public partial class User
 {
-    public User() 
+    public User()
     {
         CourseDetails = new HashSet<CourseDetail>();
         Professors = new HashSet<Professor>();
-        QuizTakers = new HashSet<QuizTaker>();      
-        RefreshTokens = new HashSet<RefreshToken>();        
-    }   
+        QuizTakers = new HashSet<QuizTaker>();
+        RefreshTokens = new HashSet<RefreshToken>();
+    }
     public int Id { get; set; }
 
     public string Username { get; set; } = null!;
@@ -32,9 +32,9 @@ public partial class User
 
     public string? Phone { get; set; }
 
-    public string? Avatar { get; set; } = string.Empty;
+    public string? Avatar { get; set; }
 
-    public string? Salt { get; set; } = string.Empty;
+    public string? Salt { get; set; }
 
     public DateTime? RegDate { get; set; }
 
@@ -46,5 +46,5 @@ public partial class User
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
-    public virtual Role? Role { get; set; }
+    public virtual Role Role { get; set; } = null!;
 }

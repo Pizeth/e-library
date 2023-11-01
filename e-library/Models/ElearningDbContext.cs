@@ -316,9 +316,7 @@ public partial class ElearningDbContext : DbContext
             entity.ToTable("Role");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Role1)
-                .HasMaxLength(50)
-                .HasColumnName("Role");
+            entity.Property(e => e.RoleName).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Type>(entity =>
