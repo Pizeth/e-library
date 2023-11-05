@@ -8,7 +8,6 @@ public partial class User
     public User()
     {
         CourseDetails = new HashSet<CourseDetail>();
-        Professors = new HashSet<Professor>();
         QuizTakers = new HashSet<QuizTaker>();
         RefreshTokens = new HashSet<RefreshToken>();
     }
@@ -39,8 +38,6 @@ public partial class User
     public DateTime? RegDate { get; set; }
 
     public virtual ICollection<CourseDetail> CourseDetails { get; set; } = new List<CourseDetail>();
-
-    public virtual ICollection<Professor> Professors { get; set; } = new List<Professor>();
 
     public virtual ICollection<QuizTaker> QuizTakers { get; set; } = new List<QuizTaker>();
 
