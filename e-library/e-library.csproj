@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Upload\Avatar\" />
     <Folder Include="Upload\Cover\" />
     <Folder Include="Upload\Pages\" />
   </ItemGroup>

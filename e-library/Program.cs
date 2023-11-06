@@ -94,6 +94,13 @@ app.UseStaticFiles(new StaticFileOptions()
     RequestPath = new PathString("/Images")
 });
 
+app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+{
+    FileProvider = new PhysicalFileProvider(
+                            Path.Combine(Directory.GetCurrentDirectory(), @"Upload")),
+    RequestPath = new PathString("/images")
+});
+
 app.UseAuthentication();
 
 app.UseAuthorization();

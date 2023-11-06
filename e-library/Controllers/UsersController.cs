@@ -15,6 +15,7 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Newtonsoft.Json;
 
 namespace e_library.Controllers
 {
@@ -138,10 +139,16 @@ namespace e_library.Controllers
 
         // POST: api/Users
         [HttpPost("Register")]
-        public async Task<ActionResult<UserWithToken>> RegisterUser([FromBody] User user, IFormFile file, CancellationToken cancellationtoken)
+        public async Task<ActionResult<UserWithToken>> RegisterUser([FromForm] UserRequest userRequest)
         {
-            var result = await WriteFile(file, user.Username);
-            user.Avatar = GetPath().Result + result;
+            User user = JsonConvert.DeserializeObject<User>(userRequest.User);
+            IFormFile file = userRequest.File;
+            if (file.Length > 0)
+            {
+                var result = await WriteFile(file, user.Username);
+                //user.Avatar = GetPath().Result + result;
+                user.Avatar = result;
+            }
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -177,7 +184,7 @@ namespace e_library.Controllers
                 var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
                 filename = name + "_" + DateTime.Now.Ticks.ToString() + extension;
 
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Files");
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\Avatar");
 
                 if (!Directory.Exists(filepath))
                 {
@@ -194,7 +201,7 @@ namespace e_library.Controllers
             catch (Exception ex)
             {
             }
-            return "/Images/" + filename;
+            return "Images/Avatar" + filename;
         }
 
         // GET: api/Users
