@@ -139,16 +139,16 @@ namespace e_library.Controllers
 
         // POST: api/Users
         [HttpPost("Register")]
-        public async Task<ActionResult<UserWithToken>> RegisterUser([FromForm] UserRequest userRequest)
+        public async Task<ActionResult<UserWithToken>> RegisterUser([FromForm] User user)
         {
-            User user = JsonConvert.DeserializeObject<User>(userRequest.User);
-            IFormFile file = userRequest.File;
-            if (file.Length > 0)
-            {
-                var result = await WriteFile(file, user.Username);
-                //user.Avatar = GetPath().Result + result;
-                user.Avatar = result;
-            }
+            //User user = JsonConvert.DeserializeObject<User>(userRequest.User);
+            //IFormFile file = userRequest.File;
+            //if (file.Length > 0)
+            //{
+            //    var result = await WriteFile(file, user.Username);
+            //    //user.Avatar = GetPath().Result + result;
+            //    user.Avatar = result;
+            //}
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
