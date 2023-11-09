@@ -49,10 +49,10 @@ namespace e_library.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
@@ -83,8 +83,7 @@ namespace e_library.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<UserWithToken>> Login([FromBody] User user)
         {
-            user = await _context.Users.Include(u => u.Role)
-                                        .Where(u => (u.Email == user.Username
+            user = await _context.Users.Where(u => (u.Email == user.Username
                                                 || u.Username == user.Username)
                                                 && u.Password == user.Password).FirstOrDefaultAsync();
             UserWithToken userWithToken;
@@ -139,7 +138,7 @@ namespace e_library.Controllers
 
         // POST: api/Users
         [HttpPost("Register")]
-        public async Task<ActionResult<UserWithToken>> RegisterUser([FromForm] User user)
+        public async Task<ActionResult<UserWithToken>> RegisterUser(User user)
         {
             //User user = JsonConvert.DeserializeObject<User>(userRequest.User);
             //IFormFile file = userRequest.File;
@@ -154,8 +153,9 @@ namespace e_library.Controllers
             await _context.SaveChangesAsync();
 
             //load role for registered user
-            user = await _context.Users.Include(u => u.Role)
-                                        .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+            //user = await _context.Users.Include(u => u.Role)
+            //                            .Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+            user = await _context.Users.Where(u => u.Id == user.Id).FirstOrDefaultAsync();
 
             UserWithToken userWithToken;
 
