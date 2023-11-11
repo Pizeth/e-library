@@ -5,6 +5,10 @@ namespace e_library.Models;
 
 public partial class Book
 {
+    public Book()
+    {
+        BookChapters = new HashSet<BookChapter>();
+    }
     public int Id { get; set; }
 
     public string BookTitle { get; set; } = null!;
@@ -21,7 +25,7 @@ public partial class Book
 
     public int? GenreId { get; set; }
 
-    public virtual Author Author { get; set; } = null!;
+    public virtual Author? Author { get; set; }
 
     public virtual ICollection<BookChapter> BookChapters { get; set; } = new List<BookChapter>();
 

@@ -312,7 +312,7 @@ namespace e_library.Controllers
                 {
                     new Claim(ClaimTypes.Name, Convert.ToString(userId))
                 }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddSeconds(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
             };

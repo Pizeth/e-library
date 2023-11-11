@@ -193,9 +193,7 @@ public partial class ElearningDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Cover).HasMaxLength(500);
-            entity.Property(e => e.Genre1)
-                .HasMaxLength(50)
-                .HasColumnName("Genre");
+            entity.Property(e => e.GenreName).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Professor>(entity =>
@@ -205,6 +203,12 @@ public partial class ElearningDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Institute).HasMaxLength(50);
             entity.Property(e => e.ProfessorName).HasMaxLength(50);
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Professors)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Professor_User");
         });
 
         modelBuilder.Entity<Quiz>(entity =>

@@ -5,6 +5,11 @@ namespace e_library.Models;
 
 public partial class Category
 {
+    public Category() 
+    {
+        Books = new HashSet<Book>();
+        Courses = new HashSet<Course>();
+    }
     public int Id { get; set; }
 
     public string? CategoryName { get; set; }

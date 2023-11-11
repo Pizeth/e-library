@@ -13,5 +13,5 @@ public partial class ChapterDetail
 
     public string? Body { get; set; }
 
-    public virtual BookChapter? Chapter { get; set; }
+    public virtual BookChapter Chapter { get; set; } = null!;
 }

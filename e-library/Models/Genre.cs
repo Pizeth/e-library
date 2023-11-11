@@ -5,9 +5,13 @@ namespace e_library.Models;
 
 public partial class Genre
 {
+    public Genre() 
+    {
+        Books = new HashSet<Book>();
+    }
     public int Id { get; set; }
 
-    public string Genre1 { get; set; } = null!;
+    public string GenreName { get; set; } = null!;
 
     public string? Cover { get; set; }
 
